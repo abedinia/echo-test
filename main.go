@@ -10,21 +10,15 @@ import (
 	"encoding/json"
 	"bytes"
 	"github.com/labstack/echo/middleware"
+	"echo-example/admin"
 )
 
-type Cat struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-}
 
 func homePage(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello this is my first project with go and echo framework")
 }
-
 func getUser(c echo.Context) error {
-	// User ID from path `users/:id`
-	id := c.Param("id")
-	return c.String(http.StatusOK, id)
+	return c.String(http.StatusOK, "Hello this is my first project with go and echo framework")
 }
 
 func show(c echo.Context) error {
@@ -94,7 +88,7 @@ func youtubeData(c echo.Context) error {
 }
 
 func adding(c echo.Context) error {
-	cat := Cat{}
+	cat := admin.Cat{}
 	defer c.Request().Body.Close()
 	b, err := ioutil.ReadAll(c.Request().Body)
 	if err != nil {
@@ -113,7 +107,7 @@ func adding(c echo.Context) error {
 }
 
 func Newadd(c echo.Context) error {
-	cat := Cat{}
+	cat := admin.Cat{}
 	defer c.Request().Body.Close()
 
 	buff := bytes.Buffer{}
@@ -147,7 +141,7 @@ func interfaciiing(c echo.Context) error {
 }
 
 func echoAdd(c echo.Context) error {
-	cat := Cat{}
+	cat := admin.Cat{}
 	err := c.Bind(&cat)
 	if err != nil {
 		log.Print(err.Error())
