@@ -12,6 +12,11 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
+type Cat struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 func homePage(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello this is my first project with go and echo framework")
 }
@@ -87,10 +92,6 @@ func youtubeData(c echo.Context) error {
 		"error" : "no data type available in query string",
 	})
 }
-type Cat struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-}
 
 func adding(c echo.Context) error {
 	cat := Cat{}
@@ -145,6 +146,17 @@ func interfaciiing(c echo.Context) error {
 	return nil
 }
 
+func echoAdd(c echo.Context) error {
+	cat := Cat{}
+	err := c.Bind(&cat)
+	if err != nil {
+		log.Print(err.Error())
+		return c.String(http.StatusInternalServerError, "error error error")
+	}
+	return c.String(http.StatusOK, "we catch your cat :)")
+
+}
+
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -155,9 +167,10 @@ func main() {
 	e.GET("/channel", channeling)
 	e.GET("/youtube", youtube)
 	e.GET("/youtube/:dataType", youtubeData)
+	e.GET("/interface", interfaciiing)
 	e.POST("/youtube/add", adding)
 	e.POST("/youtube/newadd", Newadd)
-	e.GET("/interface", interfaciiing)
+	e.POST("/echo/add", echoAdd)
 
 
 	e.Logger.Fatal(e.Start(":1323"))
