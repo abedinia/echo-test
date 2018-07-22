@@ -5,16 +5,12 @@ import (
 	"github.com/labstack/echo"
 	"fmt"
 	"time"
+	"io/ioutil"
+	"github.com/labstack/gommon/log"
+	"encoding/json"
+	"bytes"
+	"github.com/labstack/echo/middleware"
 )
-
-func main() {
-	e := echo.New()
-	e.GET("/", homePage)
-	e.GET("/users/:id", getUser)
-	e.GET("/show", show)
-	e.GET("/channel", channeling)
-	e.Logger.Fatal(e.Start(":1323"))
-}
 
 func homePage(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello this is my first project with go and echo framework")
@@ -63,4 +59,127 @@ func alaki (channling chan int) {
 		}
 		close(channling)
 	}()
+}
+
+
+func youtube(c echo.Context) error {
+	name := c.QueryParam("name")
+	cat := c.QueryParam("cat")
+
+	return c.String(http.StatusOK, fmt.Sprintf("your name is %s\n and your type is %s", name, cat))
+}
+
+
+func youtubeData(c echo.Context) error {
+	dataType := c.Param("dataType")
+	fmt.Println(dataType)
+
+	if dataType == "string" {
+		return c.String(http.StatusOK, fmt.Sprintf("your data is omade injaa :))))"))
+	}
+
+	if dataType == "json" {
+		return c.JSON(http.StatusOK, map[string] string {
+			"name" : "aaa",
+		})
+	}
+	return c.JSON(http.StatusBadRequest, map[string] string {
+		"error" : "no data type available in query string",
+	})
+}
+type Cat struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+func adding(c echo.Context) error {
+	cat := Cat{}
+	defer c.Request().Body.Close()
+	b, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Printf("Failed to load data of body : %", err)
+		return c.String(http.StatusInternalServerError, "")
+	}
+
+	err = json.Unmarshal(b, &cat)
+	if err != nil {
+		log.Printf("failed to UnMarshal : %", err)
+		return c.String(http.StatusInternalServerError, "")
+	}
+
+	log.Print("This is your Cat %#d", cat)
+	return c.String(http.StatusOK, "we got your cat")
+}
+
+func Newadd(c echo.Context) error {
+	cat := Cat{}
+	defer c.Request().Body.Close()
+
+	buff := bytes.Buffer{}
+	buff.ReadFrom(c.Request().Body)
+
+	if err := json.Unmarshal(buff.Bytes(), &cat); err != nil {
+		log.Printf("failed to UnMarshal : %", err)
+		return c.String(http.StatusInternalServerError, "")
+	}
+
+	log.Printf("This is your Cat %v", cat)
+	return c.String(http.StatusOK, "we got your cat")
+}
+
+func interfaciiing(c echo.Context) error {
+	var i Myinterface
+
+	i = myImplementation{}
+	i.goingnow()
+	i.asshole("asdasd", "asdajkshd")
+
+
+	var g Myinterface
+
+	g = NewMyinterface()
+	g.goingnow()
+	g.asshole("asdasd", "asdajkshd")
+
+
+	return nil
+}
+
+func main() {
+	e := echo.New()
+	e.Use(middleware.Logger())
+
+	e.GET("/", homePage)
+	e.GET("/users/:id", getUser)
+	e.GET("/show", show)
+	e.GET("/channel", channeling)
+	e.GET("/youtube", youtube)
+	e.GET("/youtube/:dataType", youtubeData)
+	e.POST("/youtube/add", adding)
+	e.POST("/youtube/newadd", Newadd)
+	e.GET("/interface", interfaciiing)
+
+
+	e.Logger.Fatal(e.Start(":1323"))
+}
+
+type Myinterface interface{
+	goingnow()
+	asshole(string, string)
+}
+
+func NewMyinterface () Myinterface {
+	return myImplementation{}
+}
+
+type myImplementation struct {
+Aydin string
+}
+
+func (as myImplementation) goingnow() {
+	fmt.Printf("salam")
+}
+
+func (as myImplementation) asshole(an, on string) {
+	fmt.Printf("khobi ?")
 }
