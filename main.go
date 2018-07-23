@@ -176,9 +176,20 @@ func mainAdmin(c echo.Context) error {
 	return c.String(http.StatusOK, "you are in admin panel now")
 }
 
+
+//// middleware ////
+func serverMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set(echo.HeaderServer, "BlueBot/1.0")
+		return next(c)
+	}
+}
+
 func main() {
 	e := echo.New()
 	//e.Use(middleware.Logger())
+
+	e.Use(serverMiddleWare)
 
 	g := e.Group("/admin")
 	g.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: `[${time_rfc3339}] ${status} ${method} ${host}` }))
@@ -191,7 +202,6 @@ func main() {
 	}))
 
 
-	g.GET("/main", mainAdmin)
 	e.GET("/", homePage)
 	e.GET("/users/:id", getUser)
 	e.GET("/show", show)
@@ -199,10 +209,13 @@ func main() {
 	e.GET("/youtube", youtube)
 	e.GET("/youtube/:dataType", youtubeData)
 	e.GET("/interface", interfaciiing)
+
 	e.POST("/youtube/add", adding)
 	e.POST("/youtube/newadd", Newadd)
 	e.POST("/echo/add", echoAdd)
 
+	// admin routes
+	g.GET("/main", mainAdmin)
 
 
 	e.Logger.Fatal(e.Start(":1323"))
