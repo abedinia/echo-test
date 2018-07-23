@@ -183,6 +183,14 @@ func main() {
 	g := e.Group("/admin")
 	g.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: `[${time_rfc3339}] ${status} ${method} ${host}` }))
 
+	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+		if username == "admin" && password == "123456" {
+			return true, nil
+		}
+		return false, nil
+	}))
+
+
 	g.GET("/main", mainAdmin)
 	e.GET("/", homePage)
 	e.GET("/users/:id", getUser)
