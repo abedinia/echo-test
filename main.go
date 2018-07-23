@@ -9,8 +9,8 @@ import (
 	"github.com/labstack/gommon/log"
 	"encoding/json"
 	"bytes"
-	"github.com/labstack/echo/middleware"
 	"echo-example/admin"
+	"github.com/labstack/echo/middleware"
 )
 
 
@@ -151,25 +151,6 @@ func echoAdd(c echo.Context) error {
 
 }
 
-func main() {
-	e := echo.New()
-	e.Use(middleware.Logger())
-
-	e.GET("/", homePage)
-	e.GET("/users/:id", getUser)
-	e.GET("/show", show)
-	e.GET("/channel", channeling)
-	e.GET("/youtube", youtube)
-	e.GET("/youtube/:dataType", youtubeData)
-	e.GET("/interface", interfaciiing)
-	e.POST("/youtube/add", adding)
-	e.POST("/youtube/newadd", Newadd)
-	e.POST("/echo/add", echoAdd)
-
-
-	e.Logger.Fatal(e.Start(":1323"))
-}
-
 type Myinterface interface{
 	goingnow()
 	asshole(string, string)
@@ -189,4 +170,32 @@ func (as myImplementation) goingnow() {
 
 func (as myImplementation) asshole(an, on string) {
 	fmt.Printf("khobi ?")
+}
+
+func mainAdmin(c echo.Context) error {
+	return c.String(http.StatusOK, "you are in admin panel now")
+}
+
+func main() {
+	e := echo.New()
+	//e.Use(middleware.Logger())
+
+	g := e.Group("/admin")
+	g.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: `[${time_rfc3339}] ${status} ${method} ${host}` }))
+
+	g.GET("/main", mainAdmin)
+	e.GET("/", homePage)
+	e.GET("/users/:id", getUser)
+	e.GET("/show", show)
+	e.GET("/channel", channeling)
+	e.GET("/youtube", youtube)
+	e.GET("/youtube/:dataType", youtubeData)
+	e.GET("/interface", interfaciiing)
+	e.POST("/youtube/add", adding)
+	e.POST("/youtube/newadd", Newadd)
+	e.POST("/echo/add", echoAdd)
+
+
+
+	e.Logger.Fatal(e.Start(":1323"))
 }
